@@ -6,6 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/movie_list_tv"/>
+
     <android.support.v7.widget.RecyclerView android:id="@+id/movie_poster_rv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
