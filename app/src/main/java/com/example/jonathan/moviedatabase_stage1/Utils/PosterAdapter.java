@@ -27,6 +27,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.CustomView
     public double aspectRatio = 1.5;
 
     private ArrayList<MovieDataModel> dataSet;
+    private LinearLayout.LayoutParams params;
 
     //Custom View Holder
     public static class CustomViewHolder extends RecyclerView.ViewHolder {
@@ -40,8 +41,9 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.CustomView
         }
     }
 
-    public PosterAdapter(ArrayList<MovieDataModel> data) {
+    public PosterAdapter(ArrayList<MovieDataModel> data, LinearLayout.LayoutParams params) {
         this.dataSet = data;
+        this.params = params;
     }
 
     @Override
@@ -59,19 +61,6 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.CustomView
     public void onBindViewHolder(final CustomViewHolder holder, final int listPosition) {
         //TextView textViewTitle = holder.movieName;
         ImageView imageViewPoster = holder.moviePoster;
-
-        //Get Display Width and Set Image View Layout Params
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        displayMetrics = Resources.getSystem().getSystem().getDisplayMetrics();
-
-        Integer width = displayMetrics.widthPixels / 2;
-        Double height = width * aspectRatio;
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                width,
-                height.intValue()
-
-        );
 
         imageViewPoster.setLayoutParams(params);
 

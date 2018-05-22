@@ -18,6 +18,7 @@ import com.example.jonathan.moviedatabase_stage1.Data.sampleMovieData;
 import com.example.jonathan.moviedatabase_stage1.Utils.JsonUtils;
 import com.example.jonathan.moviedatabase_stage1.Utils.NetworkUtils;
 import com.example.jonathan.moviedatabase_stage1.Utils.PosterAdapter;
+import com.example.jonathan.moviedatabase_stage1.Utils.PosterLayoutSize;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
     private JSONObject baseJsonResult;
     private JSONArray MovieDatabase;
 
+    //Dynamic Grid Layout
+    private PosterLayoutSize posterLayoutSize;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +68,9 @@ public class MainActivity extends AppCompatActivity {
 
         //Get JSON Data
         makeTMDBQuery();
+
+        //Get Layout Size
+        posterLayoutSize = new PosterLayoutSize();
 
 
         data = new ArrayList<MovieDataModel>();
@@ -89,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if( data != null) {
-            adapter = new PosterAdapter(data);
+            adapter = new PosterAdapter(data,posterLayoutSize.getParams());
         }
         //adapter = new PosterAdapter(data);
         recyclerView.setAdapter(adapter);
@@ -167,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             //}
 
-            adapter = new PosterAdapter(data);
+            adapter = new PosterAdapter(data, posterLayoutSize.getParams());
             recyclerView.setAdapter(adapter);
         }
 
