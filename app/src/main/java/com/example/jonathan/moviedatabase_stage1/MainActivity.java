@@ -67,12 +67,16 @@ public class MainActivity extends AppCompatActivity {
 
 
         data = new ArrayList<MovieDataModel>();
+        // Sample Movie Data
+        /*
+        data = new ArrayList<MovieDataModel>();
         for(int i = 0; i < sampleMovieData.Length(); i++) {
                 //data.add(JsonUtils.parseMovieData(MovieDatabase.getJSONObject(i)));
             MovieDataModel newMovie = new MovieDataModel();
             newMovie.setOriginalTitle(sampleMovieData.getString(i));
             data.add(newMovie);
         }
+        */
 
         if ( MovieDatabase != null) {
             for (int i = 0; i < 10; i++) {
@@ -84,7 +88,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        adapter = new PosterAdapter(data);
+        if( data != null) {
+            adapter = new PosterAdapter(data);
+        }
+        //adapter = new PosterAdapter(data);
         recyclerView.setAdapter(adapter);
 
     }
