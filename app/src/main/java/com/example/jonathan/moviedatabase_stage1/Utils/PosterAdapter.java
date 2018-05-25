@@ -2,16 +2,13 @@ package com.example.jonathan.moviedatabase_stage1.Utils;
 
 import java.util.ArrayList;
 
-import android.content.Context;
-import android.content.res.Resources;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Display;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,30 +16,54 @@ import android.widget.TextView;
 import com.example.jonathan.moviedatabase_stage1.Data.MovieDataModel;
 import com.example.jonathan.moviedatabase_stage1.MainActivity;
 import com.example.jonathan.moviedatabase_stage1.R;
+import com.example.jonathan.moviedatabase_stage1.movieDetail;
 import com.squareup.picasso.Picasso;
 
 public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.CustomViewHolder>
 {
 
-    public double aspectRatio = 1.5;
+    private static ArrayList<MovieDataModel> dataSet;
+    private final LinearLayout.LayoutParams params;
 
-    private ArrayList<MovieDataModel> dataSet;
-    private LinearLayout.LayoutParams params;
+    private OnItemClicked onClick;
+    public interface OnItemClicked {
+        void onItemClick();
+    }
 
     //Custom View Holder
-    public static class CustomViewHolder extends RecyclerView.ViewHolder {
+    public static class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView movieName;
-        ImageView moviePoster;
+        final ImageView moviePoster;
+        private AdapterView.OnItemClickListener itemClickListener;
 
-        public CustomViewHolder(View itemView) {
+        CustomViewHolder(View itemView) {
             super(itemView);
-            //this.movieName = (TextView) itemView.findViewById(R.id.movieTitle_tv);
-            this.moviePoster = (ImageView) itemView.findViewById(R.id.moviePoster_iv);
+            this.moviePoster = itemView.findViewById(R.id.moviePoster_iv);
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View itemView) {
+            Log.d("VIEW:", "Hello from the string");
+            Intent intent = new Intent(this.itemView.getContext(), movieDetail.class);
+
+            intent.putExtra("originalTitle",dataSet.get(getAdapterPosition()).getOriginalTitle());
+            intent.putExtra("overview",dataSet.get(getAdapterPosition()).getOverview());
+            intent.putExtra("rating",dataSet.get(getAdapterPosition()).getRating());
+            intent.putExtra("posterPath",dataSet.get(getAdapterPosition()).getPosterPath());
+            intent.putExtra("releaseDate",dataSet.get(getAdapterPosition()).getReleaseDate());
+
+            itemView.getContext().startActivity(intent);
+        }
+
+        void setItemClickListener(AdapterView.OnItemClickListener clickListener) {
+            this.itemClickListener = clickListener;
         }
     }
 
     public PosterAdapter(ArrayList<MovieDataModel> data, LinearLayout.LayoutParams params) {
-        this.dataSet = data;
+        dataSet = data;
         this.params = params;
     }
 
@@ -53,8 +74,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.CustomView
 
         view.setOnClickListener(MainActivity.posterOnClickListener);
 
-        CustomViewHolder myViewHolder = new CustomViewHolder(view);
-        return myViewHolder;
+        return new CustomViewHolder(view);
     }
 
     @Override
@@ -69,10 +89,22 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.CustomView
         Picasso.with(imageViewPoster.getContext())
                 .load("http://image.tmdb.org/t/p/w342//" + dataSet.get(listPosition).getPosterPath())
                 .into(imageViewPoster);
+
+        //handle click
+        holder.setItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                onClick.onItemClick();
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return dataSet.size();
+    }
+
+    public void setOnClick(OnItemClicked onClick) {
+        this.onClick = onClick;
     }
 }

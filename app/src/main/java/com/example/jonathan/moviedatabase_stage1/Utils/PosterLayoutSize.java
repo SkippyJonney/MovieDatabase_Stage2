@@ -6,9 +6,7 @@ import android.widget.LinearLayout;
 
 public class PosterLayoutSize {
 
-    private double aspectRatio = 1.5;
-
-    private LinearLayout.LayoutParams params;
+    private final LinearLayout.LayoutParams params;
 
     public PosterLayoutSize() {
         //Get Display Width and Set Image View Layout Params
@@ -16,6 +14,7 @@ public class PosterLayoutSize {
         displayMetrics = Resources.getSystem().getSystem().getDisplayMetrics();
 
         Integer width = displayMetrics.widthPixels / 2;
+        double aspectRatio = 1.5;
         Double height = width * aspectRatio;
 
         params = new LinearLayout.LayoutParams(

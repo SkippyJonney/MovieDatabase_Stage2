@@ -1,8 +1,8 @@
 package com.example.jonathan.moviedatabase_stage1.Data;
 
-public class sampleMovieData {
+class sampleMovieData {
 
-    private static String[] titleArray = {"Jon", "Katie", "Amelia", "Perrin"
+    private static final String[] titleArray = {"Jon", "Katie", "Amelia", "Perrin"
     ,"Jonathan","Kat","Millie","Pear Pear"};
 
 

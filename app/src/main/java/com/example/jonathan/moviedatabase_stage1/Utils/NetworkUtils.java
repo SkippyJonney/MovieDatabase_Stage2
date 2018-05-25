@@ -13,15 +13,15 @@ import java.util.Scanner;
 
 public class NetworkUtils {
 
-    final static String TMDB_BASE_URL = "https://api.themoviedb.org/3/movie";
+    private final static String TMDB_BASE_URL = "https://api.themoviedb.org/3/movie";
 
     final static String PATH_POPULAR = "popular";
     final static String PATH_RATED = "top_rated";
 
     /* TODO 1 Remove API Key from github push */
-    final static String PARAM_API = "api_key";
+    private final static String PARAM_API = "api_key";
     //final static String API_KEY = "fa6ed759f59df5cc1a528d291ae8165d";
-    final static String API_KEY = BuildConfig.ApiKey;
+    private final static String API_KEY = BuildConfig.ApiKey;
 
     // Get Url using PARAM. Implements API key
     public static URL buildURI(String param) {

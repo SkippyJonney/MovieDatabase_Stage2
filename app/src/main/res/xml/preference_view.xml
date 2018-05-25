@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="pref_sync"
+        android:title="@string/Accessability_Poster"
+        android:summary="@string/Accessability_Poster"
+        android:defaultValue="true" />
+
+    <ListPreference
+        android:key="@string/lp_key_filters"
+        android:title="@string/lp_key_name"
+        android:defaultValue="@string/lp_key_default"
+        android:entries="@array/movie_filter_names"
+        android:entryValues="@array/movie_filter_values"
+        android:summary="@string/lp_key_name"
+        />
+
+</PreferenceScreen>

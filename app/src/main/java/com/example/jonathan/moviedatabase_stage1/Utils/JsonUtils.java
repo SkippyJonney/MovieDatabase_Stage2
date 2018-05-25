@@ -1,6 +1,6 @@
 package com.example.jonathan.moviedatabase_stage1.Utils;
 import com.example.jonathan.moviedatabase_stage1.Data.MovieDataModel;
-import org.json.JSONException;
+
 import org.json.JSONObject;
 
 public class JsonUtils {
@@ -9,14 +9,12 @@ public class JsonUtils {
         //Create Empty Movie Model
         MovieDataModel newMovie = new MovieDataModel();
 
-        JSONObject rootObject = json;
-
         //Parse Json into Movie Model
-        newMovie.setOriginalTitle(rootObject.optString("original_title"));
-        newMovie.setOverview(rootObject.optString("overview"));
-        newMovie.setPosterPath(rootObject.optString("poster_path"));
-        newMovie.setRating(rootObject.optString("vote_average"));
-        newMovie.setReleaseDate(rootObject.optString("release_date"));
+        newMovie.setOriginalTitle(json.optString("original_title"));
+        newMovie.setOverview(json.optString("overview"));
+        newMovie.setPosterPath(json.optString("poster_path"));
+        newMovie.setRating(json.optString("vote_average"));
+        newMovie.setReleaseDate(json.optString("release_date"));
 
 
         return newMovie;

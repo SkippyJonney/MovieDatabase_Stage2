@@ -4,9 +4,8 @@ import android.os.AsyncTask;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.function.Consumer;
 
-public class ConnectivityCheck extends AsyncTask<Void,Void,Boolean> {
+class ConnectivityCheck extends AsyncTask<Void,Void,Boolean> {
 
     private Consumer mConsumer;
     public interface Consumer {

@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">MovieDatabase_Stage1</string>
+    <string name="app_name">Discover Movies</string>
+    <string name="Error_Data">Data Not Found</string>
+    <string name="Accessability_Poster">Movie Poster</string>
+    <string name="settings">Settings</string>
+
+    <!-- Shared Preference Keys -->
+    <string name="lp_key_name">Filter By</string>
+    <string name="lp_key_filters">filters</string>
+    <string name="lp_key_default">popular</string>
 </resources>
