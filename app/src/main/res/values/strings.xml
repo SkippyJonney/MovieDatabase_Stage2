@@ -3,9 +3,14 @@
     <string name="Error_Data">Data Not Found</string>
     <string name="Accessability_Poster">Movie Poster</string>
     <string name="settings">Settings</string>
+    <string name="overview_title">Plot Synopsis</string>
 
     <!-- Shared Preference Keys -->
     <string name="lp_key_name">Filter By</string>
     <string name="lp_key_filters">filters</string>
     <string name="lp_key_default">popular</string>
+
+
+    <!--  Movie Details -->
+    <string name="Average_Rating">Avg. Rating : </string>
 </resources>

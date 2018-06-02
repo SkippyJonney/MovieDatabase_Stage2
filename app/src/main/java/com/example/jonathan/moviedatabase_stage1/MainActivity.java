@@ -23,7 +23,6 @@ import com.example.jonathan.moviedatabase_stage1.Utils.JsonUtils;
 import com.example.jonathan.moviedatabase_stage1.Utils.NetworkUtils;
 import com.example.jonathan.moviedatabase_stage1.Utils.PosterAdapter;
 import com.example.jonathan.moviedatabase_stage1.Utils.PosterLayoutSize;
-import com.example.jonathan.moviedatabase_stage1.Utils.SettingsFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,10 +31,10 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements PosterAdapter.OnItemClicked, AdapterView.OnItemSelectedListener {
 
@@ -46,8 +45,6 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
 
     private TextView mResultsTextView;
 
-    //Json Object for holding movie data from server
-    private JSONObject baseJsonResult;
     private JSONArray MovieDatabase;
 
     //Dynamic Grid Layout
@@ -55,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
 
 
     //Movie Filter
-    public Map<String, String> filterBy = new LinkedHashMap<String, String>();
+    private final Map<String, String> filterBy = new LinkedHashMap<>();
 
 
 
@@ -70,8 +67,12 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
         setSupportActionBar(toolbar);
 
         ActionBar ab = getSupportActionBar();
-        ab.setDisplayShowHomeEnabled(true);
-        ab.setTitle(R.string.app_name);
+        try {
+            Objects.requireNonNull(ab).setDisplayShowHomeEnabled(true);
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+        }
+        Objects.requireNonNull(ab).setTitle(R.string.app_name);
 
         //Dim UI
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
         filterBy.put("Rating","top_rating");
 
         //Debug
-        mResultsTextView = findViewById(R.id.movie_list_tv);
+        //mResultsTextView = findViewById(R.id.movie_list_tv);
 
         //posterOnClickListener = new PosterOnClickListener();
 
@@ -120,8 +121,7 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
 
 
     private void makeTMDBQuery(String query) {
-        String databaseQuery = query;
-        URL searchURL = NetworkUtils.buildURI(databaseQuery);
+        URL searchURL = NetworkUtils.buildURI(query);
 
         new TheMovieDatabaseQuery().execute(searchURL);
 
@@ -147,15 +147,15 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
         protected void onPostExecute(String databaseQuery) {
             if(databaseQuery != null ) {
                 //Set Text view to results
-                mResultsTextView.setText(databaseQuery);
+                //mResultsTextView.setText(databaseQuery);
                 try {
-                    baseJsonResult = new JSONObject(databaseQuery);
+                    JSONObject baseJsonResult = new JSONObject(databaseQuery);
                     MovieDatabase = baseJsonResult.getJSONArray("results");
                 } catch (JSONException ex) {
                     ex.printStackTrace();
                 }
             } else {
-                mResultsTextView.setText(R.string.Error_Data);
+                //mResultsTextView.setText(R.string.Error_Data);
             }
 
 
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
         Spinner spinner = (Spinner) item.getActionView();
 
         // Use Custom Data Class
-        List<SpinnerValues> spinnerValues = new ArrayList<SpinnerValues>();
+        List<SpinnerValues> spinnerValues = new ArrayList<>();
         String[] keyArray = getResources().getStringArray(R.array.movie_filter_names);
         String[] valueArray = getResources().getStringArray(R.array.movie_filter_values);
         for(int i = 0; i < keyArray.length; i++) {
@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
                         android.R.layout.simple_spinner_dropdown_item);
         spin_adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         */
-        ArrayAdapter<SpinnerValues> spin_adapter = new ArrayAdapter<SpinnerValues>(this, android.R.layout.simple_spinner_item, spinnerValues);
+        ArrayAdapter<SpinnerValues> spin_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, spinnerValues);
         spin_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spinner.setAdapter(spin_adapter);
@@ -235,10 +235,10 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
     }
 
     private class SpinnerValues {
-        public String value;
-        public String key;
+        final String value;
+        final String key;
 
-        public SpinnerValues(String value, String key) {
+        SpinnerValues(String value, String key) {
             this.value = value;
             this.key = key;
         }
@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
             return value;
         }
 
-        public String getKey() {
+        String getKey() {
             return key;
         }
 

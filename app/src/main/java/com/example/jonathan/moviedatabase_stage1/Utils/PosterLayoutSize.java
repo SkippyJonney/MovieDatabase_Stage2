@@ -10,8 +10,8 @@ public class PosterLayoutSize {
 
     public PosterLayoutSize() {
         //Get Display Width and Set Image View Layout Params
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        displayMetrics = Resources.getSystem().getSystem().getDisplayMetrics();
+        //DisplayMetrics displayMetrics = new DisplayMetrics();
+        DisplayMetrics displayMetrics = Resources.getSystem().getSystem().getDisplayMetrics();
 
         Integer width = displayMetrics.widthPixels / 2;
         double aspectRatio = 1.5;

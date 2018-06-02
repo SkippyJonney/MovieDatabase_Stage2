@@ -5,28 +5,35 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-class ConnectivityCheck extends AsyncTask<Void,Void,Boolean> {
+// --Commented out by Inspection START (6/1/2018 10:40 AM):
+// --Commented out by Inspection START (6/1/2018 10:40 AM):
+////class ConnectivityCheck extends AsyncTask<Void,Void,Boolean> {
+////
+////    // --Commented out by Inspection (6/1/2018 10:40 AM):private Consumer mConsumer;
+////// --Commented out by Inspection START (6/1/2018 10:40 AM):
+//////    public interface Consumer {
+//////        void accept(Boolean internet);
+//////    }
+////// --Commented out by Inspection STOP (6/1/2018 10:40 AM)
+////
+////    @Override
+////    protected Boolean doInBackground(Void... voids) {
+////        try {
+////            Socket sock = new Socket();
+////            sock.connect(new InetSocketAddress("8.8.8.8", 53), 1500);
+// --Commented out by Inspection STOP (6/1/2018 10:40 AM)
+//            sock.close();
+//            return true;
+//        } catch (IOException ex) {
+// --Commented out by Inspection STOP (6/1/2018 10:40 AM)
+            //return false;
+       // }
+    //}
 
-    private Consumer mConsumer;
-    public interface Consumer {
-        void accept(Boolean internet);
-    }
+//    @Override
+//    protected void onPostExecute(Boolean internet) {
+//        mConsumer.accept(internet);
+//    }
+//}
 
-    @Override
-    protected Boolean doInBackground(Void... voids) {
-        try {
-            Socket sock = new Socket();
-            sock.connect(new InetSocketAddress("8.8.8.8", 53), 1500);
-            sock.close();
-            return true;
-        } catch (IOException ex) {
-            return false;
-        }
-    }
-
-    @Override
-    protected void onPostExecute(Boolean internet) {
-        mConsumer.accept(internet);
-    }
-}
 

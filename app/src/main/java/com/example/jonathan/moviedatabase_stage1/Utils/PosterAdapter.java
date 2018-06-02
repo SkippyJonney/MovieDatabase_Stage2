@@ -32,7 +32,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.CustomView
 
     //Custom View Holder
     public static class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView movieName;
+        // --Commented out by Inspection (6/1/2018 10:40 AM):TextView movieName;
         final ImageView moviePoster;
         private AdapterView.OnItemClickListener itemClickListener;
 

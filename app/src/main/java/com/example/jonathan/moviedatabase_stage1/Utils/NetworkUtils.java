@@ -15,12 +15,11 @@ public class NetworkUtils {
 
     private final static String TMDB_BASE_URL = "https://api.themoviedb.org/3/movie";
 
-    final static String PATH_POPULAR = "popular";
-    final static String PATH_RATED = "top_rated";
+    // --Commented out by Inspection (6/1/2018 10:39 AM):final static String PATH_POPULAR = "popular";
+    // --Commented out by Inspection (6/1/2018 10:40 AM):final static String PATH_RATED = "top_rated";
 
     /* TODO 1 Remove API Key from github push */
     private final static String PARAM_API = "api_key";
-    //final static String API_KEY = "fa6ed759f59df5cc1a528d291ae8165d";
     private final static String API_KEY = BuildConfig.ApiKey;
 
     // Get Url using PARAM. Implements API key

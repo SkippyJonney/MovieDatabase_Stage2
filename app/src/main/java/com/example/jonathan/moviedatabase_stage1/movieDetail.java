@@ -11,14 +11,13 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-public class movieDetail extends AppCompatActivity {
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Objects;
 
-    // View Variables
-    private TextView mOriginalTitle;
-    private ImageView mImageView;
-    private TextView mRating;
-    private TextView mReleaseDate;
-    private TextView mOverview;
+public class movieDetail extends AppCompatActivity {
 
 
     @Override
@@ -31,35 +30,49 @@ public class movieDetail extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ActionBar ab = getSupportActionBar();
-        ab.setDisplayShowHomeEnabled(true);
-        ab.setDisplayHomeAsUpEnabled(true);
+        try {
+            Objects.requireNonNull(ab).setDisplayShowHomeEnabled(true);
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+        }
+        Objects.requireNonNull(ab).setDisplayHomeAsUpEnabled(true);
         ab.setTitle(R.string.app_name);
 
         //Dim UI
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
 
-        // Get Data
-        Intent intent = getIntent();
-        final String originalTitle = intent.getExtras().getString("originalTitle");
-        final String overview = intent.getExtras().getString("overview");
-        final Double rating = intent.getExtras().getDouble("rating");
-        final String posterPath = intent.getExtras().getString("posterPath");
-        final String releaseDate = intent.getExtras().getString("releaseDate");
+        String originalTitle = null;
+        String overview = null;
+        Double rating = null;
+        String posterPath = null;
+        String releaseDate = null;
+        try {
+            // Get Data
+            Intent intent = getIntent();
+            originalTitle = Objects.requireNonNull(intent.getExtras()).getString("originalTitle");
+            overview = intent.getExtras().getString("overview");
+            rating = intent.getExtras().getDouble("rating");
+            posterPath = intent.getExtras().getString("posterPath");
+            releaseDate = intent.getExtras().getString("releaseDate");
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+        }
 
         // Init Views
-        mOriginalTitle = findViewById(R.id.originalTitle_tv);
-        mImageView = findViewById(R.id.poster_iv);
-        mRating = findViewById(R.id.rating_tv);
-        mReleaseDate = findViewById(R.id.releaseDate_tv);
-        mOverview = findViewById(R.id.overview_tv);
+        TextView mOriginalTitle = findViewById(R.id.originalTitle_tv);
+        ImageView mImageView = findViewById(R.id.poster_iv);
+        TextView mRating = findViewById(R.id.rating_tv);
+        TextView mReleaseDate = findViewById(R.id.releaseDate_tv);
+        TextView mOverview = findViewById(R.id.overview_tv);
 
 
         // Assign Data
         mOriginalTitle.setText(originalTitle);
-        mRating.setText(String.format("%.2f",rating));
+        mRating.setText(R.string.Average_Rating);
+        mRating.append(String.format(Locale.US,"%.2f",rating));
         mOverview.setText(overview);
-        mReleaseDate.setText(releaseDate);
+        mReleaseDate.setText(dateFormater(releaseDate));
         Picasso.with(mImageView.getContext())
                 .load("http://image.tmdb.org/t/p/w342//" + posterPath)
                 .into(mImageView);
@@ -71,5 +84,28 @@ public class movieDetail extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    //Date Formater
+    private String dateFormater(String str) {
+
+        String inPattern  = "yyyy-mm-dd";
+        String outPattern = "MMM d, yyyy";
+        String date = null;
+        SimpleDateFormat dateFormat = new SimpleDateFormat(inPattern, Locale.US);
+
+        try {
+            Date newD = dateFormat.parse(str);
+            dateFormat.applyPattern(outPattern);
+            date = dateFormat.format(newD);
+        } catch (ParseException ex) {
+            ex.printStackTrace();
+        }
+
+        if(date != null) {
+            return date;
+        } else {
+            return str;
+        }
     }
 }

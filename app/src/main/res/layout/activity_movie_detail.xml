@@ -18,6 +18,15 @@
 
     <!-- TOP ROW -->
 
+    <TextView
+        android:id="@+id/originalTitle_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:layout_gravity="center_horizontal"
+        android:padding="@dimen/detail_padding"
+        />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,22 +46,20 @@
             android:orientation="vertical"
             android:layout_weight="1">
 
+
+
             <TextView
-                android:id="@+id/originalTitle_tv"
+                android:id="@+id/rating_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                 />
 
             <TextView
                 android:id="@+id/releaseDate_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                />
-
-            <TextView
-                android:id="@+id/rating_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                 />
 
         </LinearLayout>
@@ -63,7 +70,13 @@
     </LinearLayout>
 
 
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:text="@string/overview_title"
+        android:paddingHorizontal="@dimen/detail_padding"
+        />
 
 
     <TextView
@@ -71,6 +84,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:paddingHorizontal="@dimen/detail_padding"
          />
 
 </LinearLayout>
