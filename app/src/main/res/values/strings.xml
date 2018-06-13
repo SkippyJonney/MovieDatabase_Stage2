@@ -12,5 +12,5 @@
 
 
     <!--  Movie Details -->
-    <string name="Average_Rating">Avg. Rating : </string>
+    <string name="Average_Rating">Avg. Rating :&#160;</string>
 </resources>

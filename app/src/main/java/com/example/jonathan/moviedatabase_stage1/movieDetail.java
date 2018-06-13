@@ -72,7 +72,7 @@ public class movieDetail extends AppCompatActivity {
         mRating.setText(R.string.Average_Rating);
         mRating.append(String.format(Locale.US,"%.2f",rating));
         mOverview.setText(overview);
-        mReleaseDate.setText(dateFormater(releaseDate));
+        mReleaseDate.setText(dateFormatter(releaseDate));
         Picasso.with(mImageView.getContext())
                 .load("http://image.tmdb.org/t/p/w342//" + posterPath)
                 .into(mImageView);
@@ -86,8 +86,8 @@ public class movieDetail extends AppCompatActivity {
         return true;
     }
 
-    //Date Formater
-    private String dateFormater(String str) {
+    //Date Formatter
+    private String dateFormatter(String str) {
 
         String inPattern  = "yyyy-mm-dd";
         String outPattern = "MMM d, yyyy";

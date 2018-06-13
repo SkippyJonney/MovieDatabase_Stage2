@@ -1,5 +1,8 @@
 package com.example.jonathan.moviedatabase_stage1;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -120,10 +123,17 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
     }
 
 
+    /*  Check NETWORK CONNECTION && make QUERY */
     private void makeTMDBQuery(String query) {
         URL searchURL = NetworkUtils.buildURI(query);
 
-        new TheMovieDatabaseQuery().execute(searchURL);
+        ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNet = cm.getActiveNetworkInfo();
+        boolean activeNetwork = activeNet != null && activeNet.isConnectedOrConnecting();
+
+        if(activeNetwork) {
+            new TheMovieDatabaseQuery().execute(searchURL);
+        }
 
     }
 
