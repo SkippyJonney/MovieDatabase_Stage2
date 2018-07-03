@@ -1,8 +1,8 @@
-package com.example.jonathan.moviedatabase_stage1.Utils;
+package com.example.jonathan.moviedatabase_stage2.Utils;
 
 import android.net.Uri;
 
-import com.example.jonathan.moviedatabase_stage1.BuildConfig;
+import com.example.jonathan.moviedatabase_stage2.BuildConfig;
 
 import java.io.IOException;
 import java.io.InputStream;

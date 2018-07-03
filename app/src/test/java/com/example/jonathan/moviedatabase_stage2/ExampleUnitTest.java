@@ -1,4 +1,4 @@
-package com.example.jonathan.moviedatabase_stage1;
+package com.example.jonathan.moviedatabase_stage2;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package com.example.jonathan.moviedatabase_stage1.Data;
+package com.example.jonathan.moviedatabase_stage2.Data;
 
 import android.os.Parcel;
 import android.os.Parcelable;

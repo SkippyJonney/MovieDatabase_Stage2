@@ -3,11 +3,11 @@
 
     <!-- List Preference Arrays -->
     <string-array name="movie_filter_names">
-        <item>Popularity</item>
         <item>Rating</item>
+        <item>Popularity</item>
     </string-array>
     <string-array name="movie_filter_values">
-        <item>popular</item>
         <item>top_rated</item>
+        <item>popular</item>
     </string-array>
 </resources>

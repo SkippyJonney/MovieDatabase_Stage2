@@ -1,4 +1,4 @@
-package com.example.jonathan.moviedatabase_stage1;
+package com.example.jonathan.moviedatabase_stage2;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBar;

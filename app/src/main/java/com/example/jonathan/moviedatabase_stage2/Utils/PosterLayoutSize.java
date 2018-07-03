@@ -1,4 +1,4 @@
-package com.example.jonathan.moviedatabase_stage1.Utils;
+package com.example.jonathan.moviedatabase_stage2.Utils;
 
 import android.content.res.Resources;
 import android.util.DisplayMetrics;

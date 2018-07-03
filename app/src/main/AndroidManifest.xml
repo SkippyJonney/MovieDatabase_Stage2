@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.jonathan.moviedatabase_stage1">
+    package="com.example.jonathan.moviedatabase_stage2">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -21,6 +21,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".movieDetail"></activity>
+
+        <!-- Register Content Provider -->
+        <provider android:authorities="com.example.jonathan.moviedatabase_stage2"
+            android:exported="false"
+            android:name="com.example.jonathan.moviedatabase_stage2.Data.MovieContentProvider"
+            />
+
     </application>
 
 </manifest>

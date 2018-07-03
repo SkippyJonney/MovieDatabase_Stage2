@@ -1,6 +1,10 @@
-package com.example.jonathan.moviedatabase_stage1;
+package com.example.jonathan.moviedatabase_stage2;
 
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.content.AsyncTaskLoader;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -21,11 +25,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.jonathan.moviedatabase_stage1.Data.MovieDataModel;
-import com.example.jonathan.moviedatabase_stage1.Utils.JsonUtils;
-import com.example.jonathan.moviedatabase_stage1.Utils.NetworkUtils;
-import com.example.jonathan.moviedatabase_stage1.Utils.PosterAdapter;
-import com.example.jonathan.moviedatabase_stage1.Utils.PosterLayoutSize;
+import com.example.jonathan.moviedatabase_stage2.Data.MovieContract;
+import com.example.jonathan.moviedatabase_stage2.Data.MovieDataModel;
+import com.example.jonathan.moviedatabase_stage2.Utils.JsonUtils;
+import com.example.jonathan.moviedatabase_stage2.Utils.NetworkUtils;
+import com.example.jonathan.moviedatabase_stage2.Utils.PosterAdapter;
+import com.example.jonathan.moviedatabase_stage2.Utils.PosterLayoutSize;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,10 +44,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements PosterAdapter.OnItemClicked, AdapterView.OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements PosterAdapter.OnItemClicked, AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private static RecyclerView.Adapter adapter;
     private RecyclerView recyclerView;
+
+    /* Cursor Adapter */
+    private PosterAdapter mAdapter;
+    // const for unique loader
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int TASK_LOADER_ID = 0;
+    private Bundle mCursorArgs = new Bundle();
+    private String currentFilterKey;
+
     private static ArrayList<MovieDataModel> data;
     public static View.OnClickListener posterOnClickListener;
 
@@ -84,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
         filterBy.put("Popularity","popular");
         filterBy.put("Rating","top_rating");
 
+
         //Debug
         //mResultsTextView = findViewById(R.id.movie_list_tv);
 
@@ -98,17 +113,23 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         //Get JSON Data
+        currentFilterKey = "top_rated";
         makeTMDBQuery("top_rated");
+        //mCursorArgs = new Bundle();
+        //mCursorArgs.putString("query","top_rated");
+
 
         //Get Layout Size
         posterLayoutSize = new PosterLayoutSize();
 
         data = new ArrayList<>();
+        /*
+        data = new ArrayList<>();
 
         if ( MovieDatabase != null) {
             for (int i = 0; i < 10; i++) {
                 try {
-                    data.add(JsonUtils.parseMovieData(MovieDatabase.getJSONObject(i)));
+                    data.add(JsonUtils.parseMovieData(MovieDatabase.getJSONObject(i), this.getBaseContext(),"hello01"));
                 } catch (JSONException ex) {
                     ex.printStackTrace();
                 }
@@ -118,14 +139,23 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
         if( data != null) {
             adapter = new PosterAdapter(data,posterLayoutSize.getParams());
         }
+        */
 
-        recyclerView.setAdapter(adapter);
+        /*  SWITCH *///////////////
+        //recyclerView.setAdapter(adapter);
+        mAdapter = new PosterAdapter(this, posterLayoutSize.getParams());
+        getSupportLoaderManager().initLoader(TASK_LOADER_ID, mCursorArgs, this);
+        recyclerView.setAdapter(mAdapter);
     }
 
 
     /*  Check NETWORK CONNECTION && make QUERY */
     private void makeTMDBQuery(String query) {
         URL searchURL = NetworkUtils.buildURI(query);
+        currentFilterKey = query;
+
+        mCursorArgs.clear();
+        mCursorArgs.putString("query",query);
 
         ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNet = cm.getActiveNetworkInfo();
@@ -177,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
             //if ( MovieDatabase != null) {
                 for (int i = 0; i < MovieDatabase.length(); i++) {
                     try {
-                        data.add(JsonUtils.parseMovieData(MovieDatabase.getJSONObject(i)));
+                        data.add(JsonUtils.parseMovieData(MovieDatabase.getJSONObject(i), getBaseContext().getApplicationContext(),currentFilterKey));
                     } catch (JSONException ex) {
                         ex.printStackTrace();
                     }
@@ -186,10 +216,66 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
 
             adapter = new PosterAdapter(data, posterLayoutSize.getParams());
             //recyclerView.setAdapter(adapter);
-            recyclerView.swapAdapter(adapter, true);
+            mAdapter = new PosterAdapter(getBaseContext(), posterLayoutSize.getParams());
+            //recyclerView.swapAdapter(mAdapter,true);
+            //recyclerView.swapAdapter(adapter, true);
+
+            //mAdapter = new PosterAdapter(getBaseContext(), posterLayoutSize.getParams());
+            //recyclerView.swapAdapter(mAdapter, true);
         }
+    }
 
+    /* Additions for CURSOR */////////
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //getSupportLoaderManager().restartLoader(TASK_LOADER_ID,mCursorArgs,this);
+    }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, final Bundle loaderArgs) {
+        return new AsyncTaskLoader<Cursor>(this) {
+            Cursor mMovieData = null;
+
+            @Override
+            protected void onStartLoading() {
+                if(mMovieData != null) {
+                    deliverResults(mMovieData);
+                } else {
+                    forceLoad();
+                }
+            }
+
+            @Override
+            public Cursor loadInBackground() {
+                try {
+                    return getContentResolver().query(MovieContract.Movies.CONTENT_URI,
+                            null,
+                            "filter = '" + loaderArgs.getString("query") + "'",
+                            null,
+                            MovieContract.Movies.COLUMN_TITLE);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    return null;
+                }
+            }
+
+            public void deliverResults(Cursor data) {
+                mMovieData = data;
+                super.deliverResult(data);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
+        recyclerView.swapAdapter(mAdapter, true);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
     }
 
     @Override
@@ -236,9 +322,13 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
                                long id) {
         Log.d("VIEW: ","spinner reached");
         Log.d("VIEW: ", parent.getItemAtPosition(pos).toString());
-        makeTMDBQuery(parent.getItemAtPosition(pos).toString());
+        //makeTMDBQuery(parent.getItemAtPosition(pos).toString());
         SpinnerValues sv = (SpinnerValues) parent.getItemAtPosition(pos);
+        currentFilterKey = sv.getKey();
+        mCursorArgs.clear();
+        mCursorArgs.putString("query",currentFilterKey);
         makeTMDBQuery(sv.getKey());
+        getSupportLoaderManager().restartLoader(TASK_LOADER_ID,mCursorArgs,this);
     }
     public void onNothingSelected(AdapterView<?> parent) {
         // Do Nothing
