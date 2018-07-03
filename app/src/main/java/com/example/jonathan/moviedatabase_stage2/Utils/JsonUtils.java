@@ -13,16 +13,16 @@ import org.json.JSONObject;
 
 public class JsonUtils {
 
-    public static MovieDataModel parseMovieData(JSONObject json, Context context, String filterKey) {
+    public static void parseMovieData(JSONObject json, Context context, String filterKey) {
         //Create Empty Movie Model
-        MovieDataModel newMovie = new MovieDataModel();
+        //MovieDataModel newMovie = new MovieDataModel();
 
         //Parse Json into Movie Model
-        newMovie.setOriginalTitle(json.optString("original_title"));
-        newMovie.setOverview(json.optString("overview"));
-        newMovie.setPosterPath(json.optString("poster_path"));
-        newMovie.setRating(json.optString("vote_average"));
-        newMovie.setReleaseDate(json.optString("release_date"));
+        //newMovie.setOriginalTitle(json.optString("original_title"));
+        //newMovie.setOverview(json.optString("overview"));
+        //newMovie.setPosterPath(json.optString("poster_path"));
+        //newMovie.setRating(json.optString("vote_average"));
+        //newMovie.setReleaseDate(json.optString("release_date"));
 
         //Add movie to SQL Database
         ContentValues contentValues = new ContentValues();
@@ -36,7 +36,7 @@ public class JsonUtils {
 
         Uri uri = context.getContentResolver().insert(MovieContract.Movies.CONTENT_URI, contentValues);
 
-        return newMovie;
+        //return newMovie;
     }
 
 

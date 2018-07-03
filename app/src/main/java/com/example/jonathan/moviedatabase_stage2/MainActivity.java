@@ -57,10 +57,10 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
     private Bundle mCursorArgs = new Bundle();
     private String currentFilterKey;
 
-    private static ArrayList<MovieDataModel> data;
-    public static View.OnClickListener posterOnClickListener;
+    //private static ArrayList<MovieDataModel> data;
+    //public static View.OnClickListener posterOnClickListener;
 
-    private TextView mResultsTextView;
+    //private TextView mResultsTextView;
 
     private JSONArray MovieDatabase;
 
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
         Objects.requireNonNull(ab).setTitle(R.string.app_name);
 
         //Dim UI
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        //getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
         //SetupHashMap
         filterBy.put("Popularity","popular");
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
         //Get Layout Size
         posterLayoutSize = new PosterLayoutSize();
 
-        data = new ArrayList<>();
+        //data = new ArrayList<>();
         /*
         data = new ArrayList<>();
 
@@ -201,20 +201,20 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
 
             //populate data and refresh adapter
             //Clear data
-            data.clear();
+            //data.clear();
 
 
             //if ( MovieDatabase != null) {
                 for (int i = 0; i < MovieDatabase.length(); i++) {
                     try {
-                        data.add(JsonUtils.parseMovieData(MovieDatabase.getJSONObject(i), getBaseContext().getApplicationContext(),currentFilterKey));
+                        JsonUtils.parseMovieData(MovieDatabase.getJSONObject(i), getBaseContext().getApplicationContext(),currentFilterKey);
                     } catch (JSONException ex) {
                         ex.printStackTrace();
                     }
                 }
             //}
 
-            adapter = new PosterAdapter(data, posterLayoutSize.getParams());
+            //adapter = new PosterAdapter(data, posterLayoutSize.getParams());
             //recyclerView.setAdapter(adapter);
             mAdapter = new PosterAdapter(getBaseContext(), posterLayoutSize.getParams());
             //recyclerView.swapAdapter(mAdapter,true);
