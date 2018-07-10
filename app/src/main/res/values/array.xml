@@ -5,9 +5,11 @@
     <string-array name="movie_filter_names">
         <item>Rating</item>
         <item>Popularity</item>
+        <item>Favorites</item>
     </string-array>
     <string-array name="movie_filter_values">
         <item>top_rated</item>
         <item>popular</item>
+        <item>favorite</item>
     </string-array>
 </resources>

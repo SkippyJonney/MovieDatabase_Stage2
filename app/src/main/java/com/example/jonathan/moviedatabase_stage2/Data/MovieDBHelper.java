@@ -12,7 +12,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "movieDB.db";
 
     // schema version
-    private static final int VERSION = 2;
+    private static final int VERSION = 4;
 
 
     MovieDBHelper(Context context) {
@@ -26,6 +26,8 @@ public class MovieDBHelper extends SQLiteOpenHelper {
         final String CREATE_TABLE = "CREATE TABLE " + Movies.TABLE_NAME + " (" +
                 Movies._ID                  + " INTEGER PRIMARY KEY, " +
                 Movies.COLUMN_FILTER        + " TEXT NOT NULL, " +
+                Movies.COLUMN_ID            + " INTEGER NOT NULL, " +
+                Movies.COLUMN_FAV           + " BOOLEAN, " +
                 Movies.COLUMN_TITLE         + " TEXT NOT NULL UNIQUE, " +
                 Movies.COLUMN_OVERVIEW      + " TEXT NOT NULL, " +
                 Movies.COLUMN_RATING        + " DOUBLE NOT NULL, " +

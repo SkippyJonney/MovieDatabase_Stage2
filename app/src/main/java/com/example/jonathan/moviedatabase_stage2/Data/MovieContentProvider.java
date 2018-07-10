@@ -22,6 +22,7 @@ public class MovieContentProvider extends ContentProvider {
     // Setup URI Matcher
     public static final int MOVIES = 100;
     public static final int MOVIE_WITH_ID = 101;
+    public static final int MOVIES_FAV = 200;
     public static final UriMatcher sUriMatcher = buildUriMatcher();
 
     public static UriMatcher buildUriMatcher() {
@@ -29,6 +30,7 @@ public class MovieContentProvider extends ContentProvider {
 
         uriMatcher.addURI(MovieContract.AUTHORITY, MovieContract.PATH_MOVIES, MOVIES);
         uriMatcher.addURI(MovieContract.AUTHORITY, MovieContract.PATH_MOVIES + "/#", MOVIE_WITH_ID);
+        uriMatcher.addURI(MovieContract.AUTHORITY, MovieContract.PATH_FAV, MOVIES_FAV);
 
         return uriMatcher;
     }
@@ -59,6 +61,15 @@ public class MovieContentProvider extends ContentProvider {
 
         switch(match) {
             case MOVIES:
+                retCursor = db.query(TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            case MOVIES_FAV:
                 retCursor = db.query(TABLE_NAME,
                         projection,
                         selection,
@@ -126,6 +137,23 @@ public class MovieContentProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        // use throughout function
+        final SQLiteDatabase db = mMovieDBHelper.getWritableDatabase();
+
+        int match = sUriMatcher.match(uri);
+        int updatedRows = 0;
+
+        switch(match) {
+            case MOVIES:
+                // insert values into Movie table
+                updatedRows = db.update(TABLE_NAME, values, selection, null);
+                break;
+            // default throws UnsupportedOppExcept
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return updatedRows;
     }
 }

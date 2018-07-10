@@ -1,5 +1,7 @@
 package com.example.jonathan.moviedatabase_stage2;
 
+import android.annotation.SuppressLint;
+import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.AsyncTaskLoader;
@@ -23,10 +25,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.example.jonathan.moviedatabase_stage2.Data.MovieContract;
-import com.example.jonathan.moviedatabase_stage2.Data.MovieDataModel;
 import com.example.jonathan.moviedatabase_stage2.Utils.JsonUtils;
 import com.example.jonathan.moviedatabase_stage2.Utils.NetworkUtils;
 import com.example.jonathan.moviedatabase_stage2.Utils.PosterAdapter;
@@ -37,41 +37,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements PosterAdapter.OnItemClicked, AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static RecyclerView.Adapter adapter;
     private RecyclerView recyclerView;
 
     /* Cursor Adapter */
     private PosterAdapter mAdapter;
     // const for unique loader
-    private static final String TAG = MainActivity.class.getSimpleName();
+    //private static final String TAG = MainActivity.class.getSimpleName();
     private static final int TASK_LOADER_ID = 0;
-    private Bundle mCursorArgs = new Bundle();
-    private String currentFilterKey;
+    private final Bundle mCursorArgs = new Bundle();
+    private static String currentFilterKey;
 
-    //private static ArrayList<MovieDataModel> data;
-    //public static View.OnClickListener posterOnClickListener;
-
-    //private TextView mResultsTextView;
-
-    private JSONArray MovieDatabase;
-
-    //Dynamic Grid Layout
-    private PosterLayoutSize posterLayoutSize;
-
-
-    //Movie Filter
-    private final Map<String, String> filterBy = new LinkedHashMap<>();
-
-
+    private static JSONArray MovieDatabase;
 
 
     @Override
@@ -94,16 +78,6 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
         //Dim UI
         //getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
-        //SetupHashMap
-        filterBy.put("Popularity","popular");
-        filterBy.put("Rating","top_rating");
-
-
-        //Debug
-        //mResultsTextView = findViewById(R.id.movie_list_tv);
-
-        //posterOnClickListener = new PosterOnClickListener();
-
         recyclerView = findViewById(R.id.movie_poster_rv);
         recyclerView.setHasFixedSize(true);
 
@@ -115,34 +89,10 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
         //Get JSON Data
         currentFilterKey = "top_rated";
         makeTMDBQuery("top_rated");
-        //mCursorArgs = new Bundle();
-        //mCursorArgs.putString("query","top_rated");
-
 
         //Get Layout Size
-        posterLayoutSize = new PosterLayoutSize();
+        PosterLayoutSize posterLayoutSize = new PosterLayoutSize();
 
-        //data = new ArrayList<>();
-        /*
-        data = new ArrayList<>();
-
-        if ( MovieDatabase != null) {
-            for (int i = 0; i < 10; i++) {
-                try {
-                    data.add(JsonUtils.parseMovieData(MovieDatabase.getJSONObject(i), this.getBaseContext(),"hello01"));
-                } catch (JSONException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-
-        if( data != null) {
-            adapter = new PosterAdapter(data,posterLayoutSize.getParams());
-        }
-        */
-
-        /*  SWITCH *///////////////
-        //recyclerView.setAdapter(adapter);
         mAdapter = new PosterAdapter(this, posterLayoutSize.getParams());
         getSupportLoaderManager().initLoader(TASK_LOADER_ID, mCursorArgs, this);
         recyclerView.setAdapter(mAdapter);
@@ -154,20 +104,36 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
         URL searchURL = NetworkUtils.buildURI(query);
         currentFilterKey = query;
 
-        mCursorArgs.clear();
-        mCursorArgs.putString("query",query);
+        String inputString = "filter = '" + currentFilterKey + "'";
 
+        mCursorArgs.clear();
+        mCursorArgs.putString("query",inputString);
+
+        /*
         ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNet = cm.getActiveNetworkInfo();
+        NetworkInfo activeNet;
+        assert cm != null;
+        activeNet = cm.getActiveNetworkInfo();
         boolean activeNetwork = activeNet != null && activeNet.isConnectedOrConnecting();
 
         if(activeNetwork) {
-            new TheMovieDatabaseQuery().execute(searchURL);
+            new TheMovieDatabaseQuery(this).execute(searchURL);
+        }
+        */
+
+        if(NetworkUtils.checkNetworkStatus(this)) {
+            new TheMovieDatabaseQuery(this).execute(searchURL);
         }
 
     }
 
-    private class TheMovieDatabaseQuery extends AsyncTask<URL,Void,String> {
+    private static class TheMovieDatabaseQuery extends AsyncTask<URL,Void,String> {
+
+        // Weak reference for garbage collection.
+        private final WeakReference<MainActivity> activityReference;
+        TheMovieDatabaseQuery(MainActivity context) {
+            activityReference = new WeakReference<>(context);
+        }
 
         @Override
         protected String doInBackground(URL... params) {
@@ -194,34 +160,17 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
                 } catch (JSONException ex) {
                     ex.printStackTrace();
                 }
-            } else {
-                //mResultsTextView.setText(R.string.Error_Data);
             }
 
-
-            //populate data and refresh adapter
-            //Clear data
-            //data.clear();
-
-
-            //if ( MovieDatabase != null) {
-                for (int i = 0; i < MovieDatabase.length(); i++) {
-                    try {
-                        JsonUtils.parseMovieData(MovieDatabase.getJSONObject(i), getBaseContext().getApplicationContext(),currentFilterKey);
-                    } catch (JSONException ex) {
-                        ex.printStackTrace();
-                    }
+            for (int i = 0; i < MovieDatabase.length(); i++) {
+                try {
+                    JsonUtils.parseMovieData(MovieDatabase.getJSONObject(i), activityReference.get().getBaseContext().getApplicationContext(),currentFilterKey);
+                } catch (JSONException ex) {
+                    ex.printStackTrace();
                 }
-            //}
+            }
 
-            //adapter = new PosterAdapter(data, posterLayoutSize.getParams());
-            //recyclerView.setAdapter(adapter);
-            mAdapter = new PosterAdapter(getBaseContext(), posterLayoutSize.getParams());
-            //recyclerView.swapAdapter(mAdapter,true);
-            //recyclerView.swapAdapter(adapter, true);
-
-            //mAdapter = new PosterAdapter(getBaseContext(), posterLayoutSize.getParams());
-            //recyclerView.swapAdapter(mAdapter, true);
+            //mAdapter = new PosterAdapter(activityReference.get().getBaseContext().getApplicationContext(), posterLayoutSize.getParams());
         }
     }
 
@@ -229,9 +178,10 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
     @Override
     protected void onResume() {
         super.onResume();
-        //getSupportLoaderManager().restartLoader(TASK_LOADER_ID,mCursorArgs,this);
     }
 
+    @SuppressLint("StaticFieldLeak")
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, final Bundle loaderArgs) {
         return new AsyncTaskLoader<Cursor>(this) {
@@ -248,10 +198,11 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
 
             @Override
             public Cursor loadInBackground() {
+
                 try {
                     return getContentResolver().query(MovieContract.Movies.CONTENT_URI,
                             null,
-                            "filter = '" + loaderArgs.getString("query") + "'",
+                            loaderArgs.getString("query"),
                             null,
                             MovieContract.Movies.COLUMN_TITLE);
                 } catch (Exception ex) {
@@ -260,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
                 }
             }
 
-            public void deliverResults(Cursor data) {
+            private void deliverResults(Cursor data) {
                 mMovieData = data;
                 super.deliverResult(data);
             }
@@ -268,20 +219,14 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
         recyclerView.swapAdapter(mAdapter, true);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
-    }
-
-    @Override
-    public void onItemClick() {
-        //intent code here
-        Log.d("VIEW:", "hello world");
     }
 
     @Override
@@ -301,13 +246,6 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
             spinnerValues.add(new SpinnerValues(keyArray[i], valueArray[i]));
         }
 
-        /*
-        ArrayAdapter<CharSequence> spin_adapter = ArrayAdapter
-                .createFromResource(this,
-                        R.array.movie_filter_values,
-                        android.R.layout.simple_spinner_dropdown_item);
-        spin_adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-        */
         ArrayAdapter<SpinnerValues> spin_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, spinnerValues);
         spin_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -316,19 +254,20 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.OnI
         return true;
     }
 
-    public void onItemSelected(AdapterView<?> parent,
-                               View view,
-                               int pos,
-                               long id) {
-        Log.d("VIEW: ","spinner reached");
-        Log.d("VIEW: ", parent.getItemAtPosition(pos).toString());
-        //makeTMDBQuery(parent.getItemAtPosition(pos).toString());
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         SpinnerValues sv = (SpinnerValues) parent.getItemAtPosition(pos);
         currentFilterKey = sv.getKey();
         mCursorArgs.clear();
-        mCursorArgs.putString("query",currentFilterKey);
-        makeTMDBQuery(sv.getKey());
-        getSupportLoaderManager().restartLoader(TASK_LOADER_ID,mCursorArgs,this);
+
+        if(currentFilterKey.equals("favorite")) {
+            mCursorArgs.putString("query", "favorite = 1");
+        } else {
+            String query = "filter = '" + currentFilterKey + "'";
+            mCursorArgs.putString("query", query);
+            makeTMDBQuery(sv.getKey());
+        }
+
+        getSupportLoaderManager().restartLoader(TASK_LOADER_ID, mCursorArgs,this);
     }
     public void onNothingSelected(AdapterView<?> parent) {
         // Do Nothing

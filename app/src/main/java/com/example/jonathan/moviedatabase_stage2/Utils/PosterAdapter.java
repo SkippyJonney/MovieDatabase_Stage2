@@ -1,22 +1,15 @@
 package com.example.jonathan.moviedatabase_stage2.Utils;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import com.example.jonathan.moviedatabase_stage2.Data.MovieDataModel;
-import com.example.jonathan.moviedatabase_stage2.MainActivity;
 import com.example.jonathan.moviedatabase_stage2.R;
 import com.example.jonathan.moviedatabase_stage2.movieDetail;
 import com.squareup.picasso.Picasso;
@@ -26,9 +19,7 @@ import static com.example.jonathan.moviedatabase_stage2.Data.MovieContract.Movie
 public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.CustomViewHolder>
 {
 
-    private static ArrayList<MovieDataModel> dataSet;
     private final LinearLayout.LayoutParams params;
-
     private View.OnClickListener mClickListener;
 
     /* Cursor Additions *///////
@@ -40,11 +31,6 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.CustomView
     public PosterAdapter(Context mContext, LinearLayout.LayoutParams params) {
         this.params = params;
         this.mContext = mContext;
-    }
-
-    public PosterAdapter(ArrayList<MovieDataModel> data, LinearLayout.LayoutParams params) {
-        dataSet = data;
-        this.params = params;
     }
 
     /* ViewHolder to fill RV */
@@ -102,7 +88,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.CustomView
     public static class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final ImageView moviePoster;
 
-        public CustomViewHolder(View itemView) {
+        private CustomViewHolder(View itemView) {
             super(itemView);
             this.moviePoster = itemView.findViewById(R.id.moviePoster_iv);
             itemView.setOnClickListener(this);
@@ -118,13 +104,11 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.CustomView
             intent.putExtra("rating",mCursor.getDouble(mCursor.getColumnIndex(Movies.COLUMN_RATING)));
             intent.putExtra("posterPath",mCursor.getString(mCursor.getColumnIndex(Movies.COLUMN_POSTER_URL)));
             intent.putExtra("releaseDate",mCursor.getString(mCursor.getColumnIndex(Movies.COLUMN_RELEASE)));
+            intent.putExtra("favorite", mCursor.getInt(mCursor.getColumnIndex(Movies.COLUMN_FAV)));
+            intent.putExtra("id",mCursor.getInt(mCursor.getColumnIndex(Movies.COLUMN_ID)));
+
             itemView.getContext().startActivity(intent);
         }
-    }
-
-    private OnItemClicked onClick;
-    public interface OnItemClicked {
-        void onItemClick();
     }
 
 }

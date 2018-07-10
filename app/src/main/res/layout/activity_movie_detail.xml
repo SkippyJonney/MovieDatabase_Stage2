@@ -8,9 +8,6 @@
     android:orientation="vertical"
     tools:context=".movieDetail">
 
-
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -37,6 +34,7 @@
             android:padding="@dimen/detail_padding"
             />
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,7 +55,6 @@
                 android:layout_weight="1">
 
 
-
                 <TextView
                     android:id="@+id/rating_tv"
                     android:layout_width="wrap_content"
@@ -67,10 +64,26 @@
 
                 <TextView
                     android:id="@+id/releaseDate_tv"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     />
+
+                <Button
+                    android:id="@+id/favorite_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/buttonColorDefault"
+                    android:drawableLeft="@drawable/ic_stars_black_24dp"
+                    android:text="  Favorite        " />
+
+                <Button
+                    android:id="@+id/playTrailerBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/buttonColorDefault"
+                    android:drawableLeft="@drawable/ic_stars_black_24dp"
+                    android:text="  Play Trailer" />
 
             </LinearLayout>
 
@@ -86,6 +99,7 @@
             android:layout_weight="0"
             android:text="@string/overview_title"
             android:paddingHorizontal="@dimen/detail_padding"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             />
 
 
@@ -96,6 +110,24 @@
             android:layout_weight="1"
             android:paddingHorizontal="@dimen/detail_padding"
              />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="Review"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:paddingHorizontal="15sp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/review_tv"
+            android:padding="15sp"/>
+
+
+
 
     </LinearLayout>
 
