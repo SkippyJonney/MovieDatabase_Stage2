@@ -1,6 +1,7 @@
 package com.example.jonathan.moviedatabase_stage2;
 
 import android.annotation.SuppressLint;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -17,6 +18,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,16 +48,20 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private RecyclerView recyclerView;
-
+    private GridLayoutManager gridLayoutManager;
+    private static int currentVisiblePosition;
     /* Cursor Adapter */
     private PosterAdapter mAdapter;
     // const for unique loader
     //private static final String TAG = MainActivity.class.getSimpleName();
     private static final int TASK_LOADER_ID = 0;
     private final Bundle mCursorArgs = new Bundle();
-    private static String currentFilterKey;
+    private static String currentFilterKey = "";
 
     private static JSONArray MovieDatabase;
+    // for saved instance state
+    private static String POSITION_KEY = "POSITION";
+    private static String FILTER_KEY = "FILTER";
 
 
     @Override
@@ -81,14 +87,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         recyclerView = findViewById(R.id.movie_poster_rv);
         recyclerView.setHasFixedSize(true);
 
-        GridLayoutManager gridManager = new GridLayoutManager(this, 2);
+        gridLayoutManager = new GridLayoutManager(this, 2);
 
-        recyclerView.setLayoutManager(gridManager);
+
+
+        recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         //Get JSON Data
         currentFilterKey = "top_rated";
-        makeTMDBQuery("top_rated");
+        if(savedInstanceState != null) {
+            currentFilterKey = savedInstanceState.getString(FILTER_KEY);
+        }
+        makeTMDBQuery(currentFilterKey);
 
         //Get Layout Size
         PosterLayoutSize posterLayoutSize = new PosterLayoutSize();
@@ -96,6 +107,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mAdapter = new PosterAdapter(this, posterLayoutSize.getParams());
         getSupportLoaderManager().initLoader(TASK_LOADER_ID, mCursorArgs, this);
         recyclerView.setAdapter(mAdapter);
+        gridLayoutManager.scrollToPosition(currentVisiblePosition);
+
+        if(savedInstanceState != null) {
+            //gridLayoutManager.scrollToPosition(savedInstanceState.getInt(POSITION_KEY));
+            currentVisiblePosition = savedInstanceState.getInt(POSITION_KEY);
+            Log.d("VIS", "restoring in onCreate");
+            Log.d("VIS", Integer.toString(savedInstanceState.getInt(POSITION_KEY)));
+            gridLayoutManager.scrollToPosition(currentVisiblePosition);
+        }
     }
 
 
@@ -178,6 +198,52 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d("AAAAAAAAAAAAAAAA", "Calling OnResume " + Integer.toString(currentVisiblePosition));
+        gridLayoutManager.scrollToPosition(currentVisiblePosition);
+    }
+
+
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        currentVisiblePosition = gridLayoutManager.findFirstVisibleItemPosition();
+        Log.d("AAAAAAAAAAAAAAAA", "Calling OnStop " + Integer.toString(currentVisiblePosition));
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        currentVisiblePosition = gridLayoutManager.findFirstVisibleItemPosition();
+        Log.d("AAAAAAAAAAAAAAAA", "Calling OnStop " + Integer.toString(currentVisiblePosition));
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        //get first visible item
+        int position = gridLayoutManager.findFirstVisibleItemPosition();
+        savedInstanceState.putInt(POSITION_KEY, position);
+        savedInstanceState.putString(FILTER_KEY, currentFilterKey);
+
+        Log.d("AAAAAAAAAAAAAAAA", "Calling SaveInstanceState " + Integer.toString(position));
+
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        Log.d("AAAAAAAAAAAAAAAA", "Calling RestoreInstanceState " + Integer.toString(savedInstanceState.getInt(POSITION_KEY)));
+        currentFilterKey = savedInstanceState.getString(FILTER_KEY);
+        currentVisiblePosition = savedInstanceState.getInt(POSITION_KEY);
+
+
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -222,11 +288,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
         recyclerView.swapAdapter(mAdapter, true);
+
+        recyclerView.scrollToPosition(currentVisiblePosition);
+
+        /*
+        if(currentVisiblePosition != 0) {
+            gridLayoutManager.scrollToPosition(currentVisiblePosition);
+            currentVisiblePosition = 0;
+        }
+        */
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
+        if(currentVisiblePosition != 0) {
+            gridLayoutManager.scrollToPosition(currentVisiblePosition);
+            currentVisiblePosition = 0;
+        }
     }
 
     @Override
@@ -294,5 +373,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         public String getValue() {
             return value;
         }
+    }
+
+    private int numberOfColumns() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int widthDivider = 600;
+        int width = displayMetrics.widthPixels;
+        int nColumns = width / widthDivider;
+        if(nColumns < 2) return 2;
+        return nColumns;
     }
 }
