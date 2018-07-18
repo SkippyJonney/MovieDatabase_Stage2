@@ -52,16 +52,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static int currentVisiblePosition;
     /* Cursor Adapter */
     private PosterAdapter mAdapter;
-    // const for unique loader
-    //private static final String TAG = MainActivity.class.getSimpleName();
     private static final int TASK_LOADER_ID = 0;
     private final Bundle mCursorArgs = new Bundle();
     private static String currentFilterKey = "";
+    private static int spinnerPosition = 0;
+    private Spinner spinner;
 
     private static JSONArray MovieDatabase;
     // for saved instance state
     private static String POSITION_KEY = "POSITION";
     private static String FILTER_KEY = "FILTER";
+    private static String SPINNER_KEY = "SPINNER";
 
 
     @Override
@@ -72,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //SetupToolbar
         Toolbar toolbar = findViewById(R.id.movie_menu);
         setSupportActionBar(toolbar);
-
         ActionBar ab = getSupportActionBar();
         try {
             Objects.requireNonNull(ab).setDisplayShowHomeEnabled(true);
@@ -81,16 +81,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         Objects.requireNonNull(ab).setTitle(R.string.app_name);
 
-        //Dim UI
-        //getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-
+        // Setup Recycler View
         recyclerView = findViewById(R.id.movie_poster_rv);
         recyclerView.setHasFixedSize(true);
-
         gridLayoutManager = new GridLayoutManager(this, 2);
-
-
-
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -98,22 +92,36 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         currentFilterKey = "top_rated";
         if(savedInstanceState != null) {
             currentFilterKey = savedInstanceState.getString(FILTER_KEY);
+            Log.d("AAAAAAAAAAAAAAAA", "Restoring in OnCreate " + savedInstanceState.getString(FILTER_KEY));
         }
-        makeTMDBQuery(currentFilterKey);
+
+        mCursorArgs.clear();
+        if(currentFilterKey.equals("favorite")) {
+            mCursorArgs.putString("query", "favorite = 1");
+        } else {
+            String query = "filter = '" + currentFilterKey + "'";
+            mCursorArgs.putString("query", query);
+            makeTMDBQuery(currentFilterKey);
+        }
+
+        getSupportLoaderManager().restartLoader(TASK_LOADER_ID, mCursorArgs,this);
 
         //Get Layout Size
         PosterLayoutSize posterLayoutSize = new PosterLayoutSize();
 
         mAdapter = new PosterAdapter(this, posterLayoutSize.getParams());
-        getSupportLoaderManager().initLoader(TASK_LOADER_ID, mCursorArgs, this);
+        //getSupportLoaderManager().initLoader(TASK_LOADER_ID, mCursorArgs, this);
         recyclerView.setAdapter(mAdapter);
         gridLayoutManager.scrollToPosition(currentVisiblePosition);
 
         if(savedInstanceState != null) {
             //gridLayoutManager.scrollToPosition(savedInstanceState.getInt(POSITION_KEY));
             currentVisiblePosition = savedInstanceState.getInt(POSITION_KEY);
-            Log.d("VIS", "restoring in onCreate");
-            Log.d("VIS", Integer.toString(savedInstanceState.getInt(POSITION_KEY)));
+            spinnerPosition = savedInstanceState.getInt(SPINNER_KEY);
+            Log.d("AAAAAAAAAAAAAAAA", "Restoring Spinner OnCreate " + Integer.toString(spinnerPosition));
+            //Log.d("VIS", "restoring in onCreate");
+            //Log.d("VIS", Integer.toString(savedInstanceState.getInt(POSITION_KEY)));
+            Log.d("AAAAAAAAAAAAAAAA", "Restoring in OnCreate " + Integer.toString(currentVisiblePosition));
             gridLayoutManager.scrollToPosition(currentVisiblePosition);
         }
     }
@@ -129,17 +137,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mCursorArgs.clear();
         mCursorArgs.putString("query",inputString);
 
-        /*
-        ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNet;
-        assert cm != null;
-        activeNet = cm.getActiveNetworkInfo();
-        boolean activeNetwork = activeNet != null && activeNet.isConnectedOrConnecting();
-
-        if(activeNetwork) {
-            new TheMovieDatabaseQuery(this).execute(searchURL);
-        }
-        */
 
         if(NetworkUtils.checkNetworkStatus(this)) {
             new TheMovieDatabaseQuery(this).execute(searchURL);
@@ -230,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         int position = gridLayoutManager.findFirstVisibleItemPosition();
         savedInstanceState.putInt(POSITION_KEY, position);
         savedInstanceState.putString(FILTER_KEY, currentFilterKey);
-
+        savedInstanceState.putInt(SPINNER_KEY, spinner.getSelectedItemPosition());
         Log.d("AAAAAAAAAAAAAAAA", "Calling SaveInstanceState " + Integer.toString(position));
 
     }
@@ -242,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Log.d("AAAAAAAAAAAAAAAA", "Calling RestoreInstanceState " + Integer.toString(savedInstanceState.getInt(POSITION_KEY)));
         currentFilterKey = savedInstanceState.getString(FILTER_KEY);
         currentVisiblePosition = savedInstanceState.getInt(POSITION_KEY);
-
+        spinnerPosition = savedInstanceState.getInt(SPINNER_KEY);
 
     }
 
@@ -290,13 +287,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         recyclerView.swapAdapter(mAdapter, true);
 
         recyclerView.scrollToPosition(currentVisiblePosition);
-
-        /*
-        if(currentVisiblePosition != 0) {
-            gridLayoutManager.scrollToPosition(currentVisiblePosition);
-            currentVisiblePosition = 0;
-        }
-        */
     }
 
     @Override
@@ -315,7 +305,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         inflater.inflate(R.menu.movie_menu, menu);
 
         MenuItem item = menu.findItem(R.id.filter_spinner);
-        Spinner spinner = (Spinner) item.getActionView();
+        spinner = (Spinner) item.getActionView();
+
+
 
         // Use Custom Data Class
         List<SpinnerValues> spinnerValues = new ArrayList<>();
@@ -329,12 +321,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spin_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spinner.setAdapter(spin_adapter);
+
+        if(spinnerPosition != 0 ) {
+            spinner.setSelection(spinnerPosition);
+            spinnerPosition = 0;
+            Log.d("AAAAAAAAAAAAAAAA", "Restoring onCreateOptionsMenu " + Integer.toString(spinnerPosition));
+        }
+
         spinner.setOnItemSelectedListener(this);
         return true;
     }
 
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         SpinnerValues sv = (SpinnerValues) parent.getItemAtPosition(pos);
+
         currentFilterKey = sv.getKey();
         mCursorArgs.clear();
 
